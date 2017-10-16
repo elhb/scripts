@@ -33,7 +33,7 @@ git clone https://github.com/elhb/st_pipeline.git
 cp -vr st_pipeline st_pipeline_parallel &
 cp -vr st_pipeline st_pipeline_coordparse &
 cp -vr st_pipeline st_pipeline_anno_par &
-cd st_pipeline/repos
+cd st_pipeline/
 
 pipe_versions=( \
     pipe_master \
@@ -53,10 +53,12 @@ for pipeline_version in "${pipe_versions[@]}"; do
     done
 
 source activate pipe_151
+git checkout a7fe1222f4c835aecb9a922e0c5b5252ef340d83
 pip install stpipeline==1.5.1 #&& python tests/pipeline_run_test.py
 source deactivate
 
 source activate pipe_master
+git checkout master
 python setup.py build && python setup.py install #&& python tests/pipeline_run_test.py
 source deactivate
 
