@@ -4,6 +4,9 @@ import re
 a=sys.argv[1]
 b=sys.argv[2]
 verbose=""
+
+if a == b: sys.stderr.write( 'INFO:: the infiles are identical will not check if content is identical only validate row and column names.\n' )
+
 while not re.match('^(([Yy]((es)|(ES))?)|([Nn][Oo]?))$',verbose): verbose=raw_input('Show details? (yes/no) ')
 if re.match('^[Yy]((es)|(ES))?$',verbose): verbose=True
 else: verbose=False
@@ -49,23 +52,36 @@ spot_in_b_not_in_a = 0
 if a_row_number != b_row_number:
     if verbose: sys.stderr.write( 'Error:: the number of rows (spots) does not match in the input files.\n' )
 
+_tmp_col_names = dict()
 for column_name in a_column_index:
+    if column_name not in _tmp_col_names: _tmp_col_names[column_name] = True
+    else: sys.stderr.write( 'WARNING:: column (gene) {0} in {1} is present more than once\n'.format(column_name,a) )
     if column_name not in b_column_index:
         if verbose: sys.stderr.write( 'Error:: column (gene) {0} in {1} is not present in {2}\n'.format(column_name,a,b) )
         gene_name_errors += 1
         name_in_a_not_in_b += 1
+_tmp_col_names = dict()
 for column_name in b_column_index:
+    if column_name not in _tmp_col_names: _tmp_col_names[column_name] = True
+    else: sys.stderr.write( 'WARNING:: column (gene) {0} in {1} is present more than once\n'.format(column_name,b) )
     if column_name not in a_column_index:
         if verbose: sys.stderr.write( 'Error:: column (gene) {0} in {1} is not present in {2}\n'.format(column_name,b,a) )
         gene_name_errors += 1
-        name_in_a_not_in_a += 1
+        name_in_b_not_in_a += 1
 
+
+_row_names = dict()
 for row_name in a_rows:
+    if row_name not in _row_names: _row_names[row_name] = True
+    else: sys.stderr.write( 'WARNING:: row (spot) {0} in {1} is present more than once\n'.format(row_name,a) )
     if row_name not in b_rows:
         if verbose: sys.stderr.write( 'Error:: row {0} in {1} is not present in {2}\n'.format(row_name,a,b) )
         spot_errors +=1
         spot_in_a_not_in_b +=1
+_row_names = dict()
 for row_name in b_rows:
+    if row_name not in _row_names: _row_names[row_name] = True
+    else: sys.stderr.write( 'WARNING:: row (spot) {0} in {1} is present more than once\n'.format(row_name,b) )
     if row_name not in a_rows:
         if verbose: sys.stderr.write( 'Error:: row {0} in {1} is not present in {2}\n'.format(row_name,b,a) )
         spot_errors +=1
@@ -77,6 +93,8 @@ if gene_name_errors or spot_errors:
     sys.stderr.write( 'Error(s) were identified. ' )
     while not re.match('^(([Yy]((es)|(ES))?)|([Nn][Oo]?))$',resume):
         resume=raw_input('continue anyways? (yes/no) ')
+
+if a == b:  sys.exit(0)
 
 if re.match('^[Yy]((es)|(ES))?$',resume):
     sys.stderr.write( 'Searching for value (counts) differences in b table with a as reference ...\n' )
