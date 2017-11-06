@@ -1,5 +1,5 @@
 # create the test folder
-test_folder=~/STARtest
+test_folder=~/STARtest4
 rm -vr $test_folder
 mkdir $test_folder
 cd $test_folder
@@ -46,7 +46,7 @@ do
         then
             echo $(STAR --version)\_$version\_bam
             cd $(STAR --version)\_$version\_bam
-            STAR --runThreadN 12 --genomeDir ~/code_repos/my_mods/st_pipeline/tests/config/genomes/mouse_grcm38/ --readFilesIn ~/STARtest/R2_quality_trimmed.$version.*bam --readFilesType SAM SE --readFilesCommand samtools view -h
+            STAR --runThreadN 12 --genomeDir ~/code_repos/my_mods/st_pipeline/tests/config/contaminant_genomes/R45S5_R5S1/ --readFilesIn ~/STARtest2/R2_quality_trimmed.$version.*bam --readFilesType SAM SE --readFilesCommand samtools view -h
             cd $test_folder
         fi
 
@@ -54,13 +54,13 @@ do
         then
             echo $(STAR --version)\_$version\_sam
             cd $(STAR --version)\_$version\_sam
-            STAR --runThreadN 12 --genomeDir ~/code_repos/my_mods/st_pipeline/tests/config/genomes/mouse_grcm38/ --readFilesIn ~/STARtest/R2_quality_trimmed.$version.*sam --readFilesType SAM SE --readFilesCommand samtools view -h
+            STAR --runThreadN 12 --genomeDir ~/code_repos/my_mods/st_pipeline/tests/config/contaminant_genomes/R45S5_R5S1/ --readFilesIn ~/STARtest2/R2_quality_trimmed.$version.*sam --readFilesType SAM SE --readFilesCommand samtools view -h
             cd $test_folder
         fi
 
         echo $(STAR --version)\_$version\_fastq
         cd $(STAR --version)\_$version\_fastq
-        STAR --runThreadN 12 --genomeDir ~/code_repos/my_mods/st_pipeline/tests/config/genomes/mouse_grcm38/ --readFilesIn ~/STARtest/R2_quality_trimmed.$version.*fastq
+        STAR --runThreadN 12 --genomeDir ~/code_repos/my_mods/st_pipeline/tests/config/contaminant_genomes/R45S5_R5S1/ --readFilesIn ~/STARtest2/R2_quality_trimmed.$version.*fastq
         cd $test_folder
 
     done

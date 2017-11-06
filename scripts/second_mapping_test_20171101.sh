@@ -26,13 +26,15 @@ do
     source activate $pipeline_version
 
 # for each combination of input-file and STAR version, make a folder for the output-files
+# the version variable determines the original input file format before conversion v151=fastq and v160=bam
     for version in v151 v160;
     do
+# the file_type varible determines the format of the (some times converted) input file used for mapping with STAR
         for file_type in bam sam fastq;
         do
-            if [ $(STAR --version) == "STAR_2.5.3a" ] && [ file_type == "bam" ]
+            if [ $(STAR --version) == "STAR_2.5.3a" ] && [ $file_type == "bam" ]
             then echo "skipping old version bam"
-            elif [ $(STAR --version) == "STAR_2.5.3a" ] && [ file_type == "sam" ]
+            elif [ $(STAR --version) == "STAR_2.5.3a" ] && [ $file_type == "sam" ]
             then echo "skipping old version sam"
             else
                 mkdir $(STAR --version)\_$version\_$file_type
