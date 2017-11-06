@@ -1,4 +1,4 @@
-test_folder=~/STARtest2
+test_folder=~/STARtest3
 rm -vr $test_folder
 mkdir $test_folder
 cd $test_folder
@@ -35,7 +35,7 @@ do
         then
             echo $(STAR --version)\_$version\_bam
             cd $(STAR --version)\_$version\_bam
-            STAR --runThreadN 12 --alignIntronMin 1 --alignIntronMax 1 --outFilterMultimapNmax 1 --alignEndsType EndToEnd --outFilterMatchNmin 25 --genomeDir ~/code_repos/my_mods/st_pipeline/tests/config/contaminant_genomes/R45S5_R5S1/ --readFilesIn ~/STARtest2/R2_quality_trimmed.$version.*bam --readFilesType SAM SE --readFilesCommand samtools view -h
+            STAR --runThreadN 12 --alignIntronMin 1 --alignIntronMax 1 --outFilterMultimapNmax 1 --alignEndsType Local --outFilterMatchNmin 25 --genomeDir ~/code_repos/my_mods/st_pipeline/tests/config/contaminant_genomes/R45S5_R5S1/ --readFilesIn ~/STARtest2/R2_quality_trimmed.$version.*bam --readFilesType SAM SE --readFilesCommand samtools view -h
             cd $test_folder
         fi
 
@@ -43,13 +43,13 @@ do
         then
             echo $(STAR --version)\_$version\_sam
             cd $(STAR --version)\_$version\_sam
-            STAR --runThreadN 12 --alignIntronMin 1 --alignIntronMax 1 --outFilterMultimapNmax 1 --alignEndsType EndToEnd --outFilterMatchNmin 25 --genomeDir ~/code_repos/my_mods/st_pipeline/tests/config/contaminant_genomes/R45S5_R5S1/ --readFilesIn ~/STARtest2/R2_quality_trimmed.$version.*sam --readFilesType SAM SE --readFilesCommand samtools view -h
+            STAR --runThreadN 12 --alignIntronMin 1 --alignIntronMax 1 --outFilterMultimapNmax 1 --alignEndsType Local --outFilterMatchNmin 25 --genomeDir ~/code_repos/my_mods/st_pipeline/tests/config/contaminant_genomes/R45S5_R5S1/ --readFilesIn ~/STARtest2/R2_quality_trimmed.$version.*sam --readFilesType SAM SE --readFilesCommand samtools view -h
             cd $test_folder
         fi
 
         echo $(STAR --version)\_$version\_fastq
         cd $(STAR --version)\_$version\_fastq
-        STAR --runThreadN 12 --alignIntronMin 1 --alignIntronMax 1 --outFilterMultimapNmax 1 --alignEndsType EndToEnd --outFilterMatchNmin 25 --genomeDir ~/code_repos/my_mods/st_pipeline/tests/config/contaminant_genomes/R45S5_R5S1/ --readFilesIn ~/STARtest2/R2_quality_trimmed.$version.*fastq
+        STAR --runThreadN 12 --alignIntronMin 1 --alignIntronMax 1 --outFilterMultimapNmax 1 --alignEndsType Local --outFilterMatchNmin 25 --genomeDir ~/code_repos/my_mods/st_pipeline/tests/config/contaminant_genomes/R45S5_R5S1/ --readFilesIn ~/STARtest2/R2_quality_trimmed.$version.*fastq
         cd $test_folder
 
     done
@@ -58,4 +58,3 @@ done
 
 echo -e "\t"$(ls |grep STAR) | sed s/\ /\\t/g > stats.tsv
 paste STAR_2.5.3*/Log.final.out | cut -f 1,2,4,6,8,10,12,14,16 >> stats.tsv
-
