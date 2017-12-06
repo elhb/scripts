@@ -21,6 +21,7 @@ with open(a) as input_file:
         columns=row.rstrip().split('\t')
         if a_row_number == 0:
             for index in range(len(columns)):
+                if columns[index] in a_column_index: sys.stderr.write( 'WARNING :: duplicated gene {} in a.\n'.format(columns[index]) )
                 a_column_index[columns[index]] = index
         else:
             a_rows[columns[0]] = columns
@@ -35,6 +36,7 @@ with open(b) as input_file:
         columns=row.rstrip().split('\t')
         if b_row_number == 0:
             for index in range(len(columns)):
+                if columns[index] in b_column_index: sys.stderr.write( 'WARNING :: duplicated gene {} in b.\n'.format(columns[index]) )
                 b_column_index[columns[index]] = index
         else:
             b_rows[columns[0]] = columns
