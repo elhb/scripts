@@ -1,89 +1,5 @@
 #!/usr/bin/env bash
 
-# to speed up the fetching of reads you can prefetch the sra cahces using the following command:
-conda create -n SRApy python=2.7 --yes;
-source activate SRApy
-mkdir -p /data/ncbi/public/sra/
-ln -s /data/ncbi ~/
-cd /data/ncbi/public/sra/
-pip install srapy
-get-project-sras.py -p 316587 -F {acc}.sra &
-source deactivate
-
-# build the reference genome
-genomeDir=~/references/Mus_musculus/Ensembl/GRCm38/Sequence/STAR_Index
-gtfFile=~/references/Mus_musculus/Ensembl/GRCm38/Annotation/Genes/genes.gtf
-mkdir ~/references
-cd ~/references
-wget ftp://igenome:G3nom3s4u@ussd-ftp.illumina.com/Mus_musculus/Ensembl/GRCm38/Mus_musculus_Ensembl_GRCm38.tar.gz
-tar -xvzf Mus_musculus_Ensembl_GRCm38.tar.gz 
-STAR --runMode genomeGenerate \
---genomeDir $genomeDir \
---genomeFastaFiles ~/references/Mus_musculus/Ensembl/GRCm38/Sequence/WholeGenomeFasta/genome.fa \
---sjdbGTFfile $gtfFile \
---sjdbOverhang 100 \
---runThreadN 4 &
-
-testfolder=~/test_pipeline
-cp `basename "$0"` $testfolder/the_script_ran_at_$(date +"%y%m%d_%H_%M").sh
-# setup the analysis envs
-mkdir -p $testfolder/repos
-cd $testfolder/repos
-git clone https://github.com/elhb/st_pipeline.git
-cp -vr st_pipeline st_pipeline_parallel &
-cp -vr st_pipeline st_pipeline_coordparse &
-cp -vr st_pipeline st_pipeline_anno_par &
-cd st_pipeline/
-
-pipe_versions=( \
-    pipe_master \
-    pipe_coordparse \
-    pipe_151 \
-    pipe_parallel \
-    pipe_anno_par )
-
-# setup pipeline versions
-for pipeline_version in "${pipe_versions[@]}"; do
-    conda create -n $pipeline_version python=2.7 --yes;
-    source activate $pipeline_version
-    conda install STAR --yes
-    pip install numpy
-    pip install -r requirements.txt
-    source deactivate
-    done
-
-source activate pipe_151
-git checkout a7fe1222f4c835aecb9a922e0c5b5252ef340d83
-pip install stpipeline==1.5.1 #&& python tests/pipeline_run_test.py
-source deactivate
-
-source activate pipe_master
-git checkout master
-python setup.py build && python setup.py install #&& python tests/pipeline_run_test.py
-source deactivate
-
-cd ../st_pipeline_parallel
-source activate pipe_parallel
-git checkout parallelizing_filterInputReads
-python setup.py build && python setup.py install #&& python tests/pipeline_run_test.py
-source deactivate
-
-cd ../st_pipeline_coordparse
-source activate pipe_coordparse
-git checkout proof_of_concept_coordinateParser
-python setup.py build && python setup.py install #&& python tests/pipeline_run_test.py
-source deactivate
-
-cd ../st_pipeline_anno_par
-source activate pipe_anno_par
-git checkout test_anntotation_parallel
-python setup.py build && python setup.py install #&& python tests/pipeline_run_test.py
-source deactivate
-
-wait
-
-cd $testfolder
-
 #
 # Define the accessions, names and id file connections
 #
@@ -129,7 +45,104 @@ declare -A ids_by_accessions=( \
                              [SRR3382389]=1000L5 \
                              [SRR3382390]=1000L5 )
 
-path_2_ids=$testfolder/st_pipeline/ids
+declare -A pids
+
+testfolder=/data/subsetTest
+rm -rvf $testfolder
+mkdir $testfolder
+start_time=$(date +"%y%m%d_%H_%M")
+cp -v "$0" $testfolder/the_script_ran_at_$start_time.sh
+mkdir -p $testfolder/rawdata
+
+## To speed up the fetching of reads you can prefetch the sra cahces using the following command:
+conda create -n SRApy python=2.7 --yes;
+source activate SRApy
+mkdir -p /data/ncbi/public/sra/
+ln -s /data/ncbi ~/
+cd /data/ncbi/public/sra/
+pip install srapy
+get-project-sras.py -p 316587 -F {acc}.sra &
+source deactivate
+
+cd $testfolder/rawdata
+for i in {0..11}; do
+# get the info from the arrays
+acc=${accessions_by_size[$i]}
+name=${names_by_accessions[$acc]}
+id=${ids_by_accessions[$acc]}
+# fetch raw data
+fastq-dump --accession $acc --split-files --origfmt --gzip & pids[$acc]=$(echo $!)
+# could add the following to get a subset --minSpotId 1000000 --maxSpotId 1010000
+done
+cd $testfolder
+
+## build the reference genome
+genomeDir=~/references/Mus_musculus/Ensembl/GRCm38/Sequence/STAR_Index
+gtfFile=~/references/Mus_musculus/Ensembl/GRCm38/Annotation/Genes/genes.gtf
+mkdir ~/references
+cd ~/references
+wget ftp://igenome:G3nom3s4u@ussd-ftp.illumina.com/Mus_musculus/Ensembl/GRCm38/Mus_musculus_Ensembl_GRCm38.tar.gz
+tar -xvzf Mus_musculus_Ensembl_GRCm38.tar.gz 
+mkdir -p $genomeDir
+STAR --runMode genomeGenerate \
+--genomeDir $genomeDir \
+--genomeFastaFiles ~/references/Mus_musculus/Ensembl/GRCm38/Sequence/WholeGenomeFasta/genome.fa \
+--sjdbGTFfile $gtfFile \
+--sjdbOverhang 100 \
+--runThreadN 4 &
+
+# setup the analysis envs
+mkdir -p $testfolder/repos
+cd $testfolder/repos
+git clone https://github.com/elhb/scripts.git
+git clone https://github.com/elhb/st_pipeline.git
+path_2_ids=$testfolder/repos/st_pipeline/ids
+cp -vr st_pipeline st_pipeline_parallel &
+cp -vr st_pipeline st_pipeline_151
+git clone https://github.com/alexdobin/STAR.git
+cd STAR/source
+git checkout ff732f10e7cd86fa2cd682cfbd6d6aee356a5e7e
+make STAR
+mkdir -p ~/bin
+ln -s $testfolder/repos/STAR/source/STAR ~/bin/STAR
+cd $testfolder/repos/st_pipeline/
+
+pipe_versions=( \
+    pipe_parallel \
+    pipe_master \
+    pipe_151 )
+
+# setup pipeline versions
+for pipeline_version in "${pipe_versions[@]}"; do
+    conda create -n $pipeline_version python=2.7 --yes;
+    source activate $pipeline_version
+    pip install numpy
+    pip install -r requirements.txt
+    source deactivate
+    done
+
+source activate pipe_151
+cd $testfolder/repos/st_pipeline_151
+conda install STAR --yes
+git checkout a7fe1222f4c835aecb9a922e0c5b5252ef340d83
+python setup.py build && python setup.py install
+#pip install stpipeline==1.5.1 #&& python tests/pipeline_run_test.py
+source deactivate
+
+source activate pipe_master
+cd $testfolder/repos/st_pipeline
+git checkout master
+python setup.py build && python setup.py install #&& python tests/pipeline_run_test.py
+source deactivate
+
+cd $testfolder/repos/st_pipeline_parallel
+source activate pipe_parallel
+git checkout parallel_filterInput_4_v1.6.0
+git pull
+python setup.py build && python setup.py install #&& python tests/pipeline_run_test.py
+source deactivate
+
+cd $testfolder
 
 #
 # Loop throught the samples get files and start the pipe
@@ -141,8 +154,8 @@ acc=${accessions_by_size[$i]}
 name=${names_by_accessions[$acc]}
 id=${ids_by_accessions[$acc]}
 
-# fetch raw data
-fastq-dump --accession $acc --split-files --origfmt #--minSpotId 1000000 --maxSpotId 11000000
+# uncomment next line to wait for all fastq-dump commands to finish before running pipeline
+wait ${pids[@]}
 
 for pipeline_version in "${pipe_versions[@]}"; do
 
@@ -150,10 +163,16 @@ source activate $pipeline_version
 
 # make directories for results
 echo $name $acc $id $pipeline_version
-results_dir=results_$(date +"%y%m%d_%H_%M")/$name\_$pipeline_version
-temp_dir=temp_$(date +"%y%m%d_%H_%M")/$name\_$pipeline_version
+STAR --version
+results_dir=results_$start_time/$name/$pipeline_version
+temp_dir=$results_dir/temp
+rm -vr $results_dir
 mkdir -p $results_dir
 mkdir -p $temp_dir
+
+echo "waiting for fq.gz file to be created ..."
+wait ${pids[$acc]}
+echo "read file generation completed."
 
 dstat \
 -Tmcd \
@@ -166,25 +185,30 @@ st_pipeline_run.py \
 --ref-map $genomeDir \
 --ref-annotation $gtfFile \
 --expName $name\_$pipeline_version \
-$acc\_1.fastq \
-$acc\_2.fastq \
+$testfolder/rawdata/$acc\_1.fastq.gz \
+$testfolder/rawdata/$acc\_2.fastq.gz \
 --output-folder $results_dir \
 --temp-folder $temp_dir \
 --ids $path_2_ids/$id\_barcodes.txt \
 --log-file $results_dir/$name\_$pipeline_version.log.txt \
 --mapping-threads 12 \
 --verbose \
---htseq-no-ambiguous \
---disable-multimap;
+--keep-discarded-files \
+--no-clean-up \
+--overhang 0 \
+--umi-cluster-algorithm hierarchical;
 
 kill $stat_logger_pid
+
+python $testfolder/repos/scripts/scripts/csv_converter_2.py $results_dir/sys_stat.$name\_$pipeline_version.csv > $results_dir/sys_stat.$name\_$pipeline_version.tsv
+python $testfolder/repos/st_pipeline/scripts/convertEnsemblToNames.py --annotation $gtfFile $results_dir/$name\_$pipeline_version\_stdata.tsv --output $results_dir/$name\_$pipeline_version\_stdata.names_fixed.tsv
 
 source deactivate
 
 done
 
 # remove the fastqs
-rm -v $acc\_*.fastq
+rm -v rawdata/$acc\_*.fastq.gz
 
 done
 
