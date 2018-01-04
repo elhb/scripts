@@ -108,7 +108,7 @@ def random_subset(filename,subset_size=int(round(3e5,0))):
         print 'WARNING:: to few reads were written will use a random selection of already buffered extra reads to fill the subset ...'
         extra_to_write=original_subset_size-counter_written
         if len(extra_reads) < extra_to_write:
-            print 'ERROR:: wont be able to fill subset to few reads were saved in buffer (there are {} we need {}).'.fomat(len(extra_reads), extra_to_write)
+            print 'ERROR:: wont be able to fill subset to few reads were saved in buffer (there are {} we need {}).'.format(len(extra_reads), extra_to_write)
         else:
             start_time = time.time()
             random.shuffle(extra_reads)
