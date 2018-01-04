@@ -103,28 +103,28 @@ if re.match('^[Yy]((es)|(ES))?$',resume):
     value_differences = 0
     _tmp_counter = 0
     for row_name, columns in a_rows.iteritems():
-    
+
         sys.stderr.write( str(round(100.0*_tmp_counter/a_row_number,2))+'% Row '+str(row_name)+':\r')
-    
+
         for name, index in a_column_index.iteritems():
-    
+
             a_value = columns[index]
             try:
                 b_value = b_rows[row_name][ b_column_index[name] ]
             except KeyError:
                 if verbose: sys.stderr.write( '\ncolumn {} notfound in b \n'.format(name) )
                 #sys.exit()
-    
-            if a_value != b_value:
-                value_differences += 1
-                if verbose: sys.stderr.write( '\nERROR:: the values don\'t match {0} != {1} for {2} at {3} (file {4} vs {5})\n'.format(str( a_value ),str( b_value),name,row_name,a,b) )
-                continue
-                
-            if re.match('^[0-9]+(\.[0-9]+)?$',a_value) or re.match('^[0-9]+(\.[0-9]+)?$',b_value):
+
+            if re.match('^[0-9]+(\.[0-9]+)?$',a_value) or re.match('^[0-9]+(\.[0-9]+)?$',b_value): # here numeric values are checked
                 if float(a_value) != float(b_value):
                     value_differences += 1
                     if verbose: sys.stderr.write( '\nERROR:: the values (floats) dont match {0} != {1} for {2} at {3} (file {4} vs {5})\n'.format(str( a_value ),str( b_value),name,row_name,a,b) )
-    
+            elif a_value != b_value: # here non numeric values are checked i.e. spot coordinates/row names
+                value_differences += 1
+                if verbose: sys.stderr.write( '\nERROR:: the values don\'t match {0} != {1} for {2} at {3} (file {4} vs {5})\n'.format(str( a_value ),str( b_value),name,row_name,a,b) )
+#                continue
+
+
         _tmp_counter+=1
 
 print "\n\n:: Summary ::\n"
