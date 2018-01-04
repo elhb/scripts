@@ -35,8 +35,8 @@ def random_subset(filename,subset_size=int(round(3e5,0))):
     mates_outfilename = mates_filename+'.random_subset.{}_reads.fq'.format(original_subset_size)+{True:'.gz',False:''}[mates_filename.endswith('.gz')]
     
     print 'INFO:: Estimating read count...'
-    if os.path.getsize(filename) > os.path.getsize(mates_filename): estimated_read_count = estimate_read_count(filename)
-    else: estimated_read_count = estimate_read_count(mates_filename)
+    if os.path.getsize(filename) > os.path.getsize(mates_filename): estimated_read_count = estimate_read_count(filename, gzipcompressionlevel=9)
+    else: estimated_read_count = estimate_read_count(mates_filename, gzipcompressionlevel=9)
     print 'INFO:: Read count estimated to {}.'.format(estimated_read_count)
     
     mode='select'
