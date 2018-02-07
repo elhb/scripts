@@ -64,11 +64,11 @@ def validate(filename, stop_after=10):
             sep2=read_pair[1][2].rstrip()
             qul1=read_pair[0][3].rstrip()
             qul2=read_pair[1][3].rstrip()
-            assert hed1 == hed2, "\nERROR:: the R1 R2 headers don't match!\n"
+            assert hed1 == hed2, "\nERROR:: the R1 R2 headers don't match! ({} != {})\n".format(hed1,hed2)
             assert re.match("^[AGTCN]+$",seq1), "\nERROR:: non DNA/RNA sequence in R1!\n"
             assert re.match("^[AGTCN]+$",seq2), "\nERROR:: non DNA/RNA sequence in R2!\n"
-            assert sep1 == '+', "\nERROR:: R1 qual sequence sepparator is not '+'!\n"
-            assert sep2 == '+', "\nERROR:: R1 qual sequence sepparator is not '+'!\n"
+            assert sep1 == '+' or sep1 == '+'+hed1[1:], "\nERROR:: R1 qual sequence sepparator is not '+'!\n"
+            assert sep2 == '+' or sep2 == '+'+hed2[1:], "\nERROR:: R1 qual sequence sepparator is not '+'!\n"
             assert re.match("^[\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/0123456789\:\;\<\=\>\?\@ABCDEFGHIJ]+$",qul1), "\nERROR:: non sanger qual value in R1!\n"
             assert re.match("^[\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/0123456789\:\;\<\=\>\?\@ABCDEFGHIJ]+$",qul2), "\nERROR:: non sanger qual value in R2!\n"
             assert len(seq1) == len(qul1), "\nERROR:: seq and qual length diff in R1!\n"
