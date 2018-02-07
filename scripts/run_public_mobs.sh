@@ -47,7 +47,7 @@ declare -A ids_by_accessions=( \
 
 declare -A pids
 
-testfolder=/data/subsetTest
+testfolder=/data/publicMOBs
 rm -rvf $testfolder
 mkdir $testfolder
 start_time=$(date +"%y%m%d_%H_%M")
@@ -95,27 +95,30 @@ STAR --runMode genomeGenerate \
 mkdir -p $testfolder/repos
 cd $testfolder/repos
 git clone https://github.com/elhb/scripts.git
+git clone https://github.com/SpatialTranscriptomicsResearch/st_pipeline.git
+mv st_pipeline st_pipeline_151
+cp -vr st_pipeline_151 st_pipeline_160 &
 git clone https://github.com/elhb/st_pipeline.git
-path_2_ids=$testfolder/repos/st_pipeline/ids
-cp -vr st_pipeline st_pipeline_parallel &
-cp -vr st_pipeline st_pipeline_151
-git clone https://github.com/alexdobin/STAR.git
-cd STAR/source
-git checkout ff732f10e7cd86fa2cd682cfbd6d6aee356a5e7e
-make STAR
-mkdir -p ~/bin
-ln -s $testfolder/repos/STAR/source/STAR ~/bin/STAR
+mv st_pipeline st_pipeline_elhb
+path_2_ids=$testfolder/repos/st_pipeline_160/ids
+#git clone https://github.com/alexdobin/STAR.git
+#cd STAR/source
+#git checkout ff732f10e7cd86fa2cd682cfbd6d6aee356a5e7e
+#make STAR
+#mkdir -p ~/bin
+#ln -s $testfolder/repos/STAR/source/STAR ~/bin/STAR
 cd $testfolder/repos/st_pipeline/
 
-pipe_versions=( \
-    pipe_parallel \
-    pipe_master \
+pipe_versions=(
+    pipe_160 \
     pipe_151 )
+    #pipe_elhb )
 
 # setup pipeline versions
 for pipeline_version in "${pipe_versions[@]}"; do
     conda create -n $pipeline_version python=2.7 --yes;
     source activate $pipeline_version
+    conda install STAR --yes
     pip install numpy
     pip install -r requirements.txt
     source deactivate
@@ -123,24 +126,23 @@ for pipeline_version in "${pipe_versions[@]}"; do
 
 source activate pipe_151
 cd $testfolder/repos/st_pipeline_151
-conda install STAR --yes
-git checkout a7fe1222f4c835aecb9a922e0c5b5252ef340d83
+git checkout 1.5.1
 python setup.py build && python setup.py install
-#pip install stpipeline==1.5.1 #&& python tests/pipeline_run_test.py
+#pip install stpipeline==1.5.1
 source deactivate
 
 source activate pipe_master
-cd $testfolder/repos/st_pipeline
-git checkout master
-python setup.py build && python setup.py install #&& python tests/pipeline_run_test.py
+cd $testfolder/repos/st_pipeline_160
+git checkout 1.6.2
+python setup.py build && python setup.py install
 source deactivate
 
-cd $testfolder/repos/st_pipeline_parallel
-source activate pipe_parallel
-git checkout parallel_filterInput_4_v1.6.0
-git pull
-python setup.py build && python setup.py install #&& python tests/pipeline_run_test.py
-source deactivate
+#cd $testfolder/repos/st_pipeline_elhb
+#source activate pipe_elhb
+#git checkout master
+#git pull
+#python setup.py build && python setup.py install
+#source deactivate
 
 cd $testfolder
 
@@ -195,7 +197,6 @@ $testfolder/rawdata/$acc\_2.fastq.gz \
 --verbose \
 --keep-discarded-files \
 --no-clean-up \
---overhang 0 \
 --umi-cluster-algorithm hierarchical;
 
 kill $stat_logger_pid
