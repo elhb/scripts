@@ -76,6 +76,15 @@ fastq-dump --accession $acc --split-files --origfmt --gzip & pids[$acc]=$(echo $
 done
 cd $testfolder
 
+## make STAR
+mkdir -p $testfolder/repos
+cd $testfolder/repos
+git clone https://github.com/alexdobin/STAR.git
+cd STAR/source
+make STAR
+mkdir -p ~/bin
+ln -s $testfolder/repos/STAR/source/STAR ~/bin/STAR
+
 ## build the reference genome
 genomeDir=~/references/Mus_musculus/Ensembl/GRCm38/Sequence/STAR_Index
 gtfFile=~/references/Mus_musculus/Ensembl/GRCm38/Annotation/Genes/genes.gtf
@@ -92,7 +101,6 @@ STAR --runMode genomeGenerate \
 --runThreadN 4 &
 
 # setup the analysis envs
-mkdir -p $testfolder/repos
 cd $testfolder/repos
 git clone https://github.com/elhb/scripts.git
 git clone https://github.com/SpatialTranscriptomicsResearch/st_pipeline.git
@@ -101,12 +109,6 @@ cp -vr st_pipeline_151 st_pipeline_160 &
 git clone https://github.com/elhb/st_pipeline.git
 mv st_pipeline st_pipeline_elhb
 path_2_ids=$testfolder/repos/st_pipeline_160/ids
-#git clone https://github.com/alexdobin/STAR.git
-#cd STAR/source
-#git checkout ff732f10e7cd86fa2cd682cfbd6d6aee356a5e7e
-#make STAR
-#mkdir -p ~/bin
-#ln -s $testfolder/repos/STAR/source/STAR ~/bin/STAR
 cd $testfolder/repos/st_pipeline/
 
 pipe_versions=(
