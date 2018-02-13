@@ -1,9 +1,13 @@
-## 1. Installing the pipeline
+# Run public sample guide
 
 This is a quick explanation of how to setup the st pipeline to run one of the public mouse olfactory bulb samples
 from the science paper.
-
 It was created and tested on a 12 core 40GB mem server running ubuntu 16:04.
+
+The following procedure will place all files in your current working directory.
+Feel free to modify paths to keep a nice and tidy structure while working :)
+
+## 1. Installing the pipeline
   
 ### 1.1 Setup a virtual env:
 Conda is a nice way to create and manage virtual envs,
