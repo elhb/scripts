@@ -24,7 +24,7 @@ In this example I will create a virtual env called stpipe using python version 2
 conda create -n stpipe python=2.7 --yes;
 ```
 
-To activate the virtual environment and start working within it run:
+To activate the virtual environment and start working wthin it run:
 ```
 source activate stpipe
 ```
@@ -79,7 +79,7 @@ and then convert them to fastq using fastq dump command from the sra toolkit.
 
 To install the srapy python package run the two following commands
 ```
-sudo apt-get install libxml2 libxml2-dev
+sudo apt-get install libxml2 libxml2-dev # note that this command uses apt which might not be the appropriate pkg manager for your system
 pip install srapy
 ```
 
