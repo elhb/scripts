@@ -54,7 +54,7 @@ Otherwise head over to the star github repo at https://github.com/alexdobin/STAR
 and follow the instruction to install the software.
 
 ## 3. Fetch a reference genome
-Illumina igenomes supplies a lot of prebuilt reference genomes have a look at to find the one for your organism:
+Illumina igenomes supplies a lot of prebuilt reference genomes have a look at the link below to find the appropriate one for your organism:
 https://support.illumina.com/sequencing/sequencing_software/igenome.html
 
 As we are currently analysing mouse olfactory bulb we will fetch the mouse genome by running the following command
