@@ -1,6 +1,6 @@
 ## 1. Installing the pipeline
 
-This is a quick explenation of how to setup the st pipeline to run one of the public mouse olfactory bulb samples
+This is a quick explanation of how to setup the st pipeline to run one of the public mouse olfactory bulb samples
 from the science paper.
 
 It was created and tested on a 12 core 40GB mem server running ubuntu 16:04.
@@ -11,7 +11,7 @@ still any other type of virtual env should work fine so choose one that you like
   
 If you want to go for conda you can find it here: https://conda.io/miniconda.html
 
-Copy pasting the following to your terminal window would start the installer for the latset linux version of miniconda:
+Copy pasting the following to your terminal window would start the installer for the latest linux version of miniconda:
 ```
 wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
 bash Miniconda2-latest-Linux-x86_64.sh
@@ -24,7 +24,7 @@ In this example I will create a virtual env called stpipe using python version 2
 conda create -n stpipe python=2.7 --yes;
 ```
 
-To activate the virutal enviroment and start working wothin it run:
+To activate the virtual environment and start working within it run:
 ```
 source activate stpipe
 ```
@@ -41,7 +41,7 @@ pip install stpipeline
 ```
 
 ## 2. Install the STAR aligner
-If you used conda to create yout virtual env just run the following commands to install STAR
+If you used conda to create your virtual env just run the following commands to install STAR
 ```
 conda config --add channels bioconda
 conda install star --yes
@@ -57,7 +57,7 @@ As we are currently analysing mouse olfactory bulb we will fetch the mouse genom
 ```
 wget ftp://igenome:G3nom3s4u@ussd-ftp.illumina.com/Mus_musculus/Ensembl/GRCm38/Mus_musculus_Ensembl_GRCm38.tar.gz
 ```
-Then to extract the refrence files:
+Then to extract the reference files:
 ```
 tar -vxzf Mus_musculus_Ensembl_GRCm38.tar.gz
 ```
@@ -74,7 +74,7 @@ STAR \
 --runThreadN 12
 ```
 ## 5. Get the raw data
-To get the raw sequencing data from ncbi the fastest method is to use the srapy pyhton pakcage to fetch the .sra files
+To get the raw sequencing data from ncbi the fastest method is to use the srapy python package to fetch the .sra files
 and then convert them to fastq using fastq dump command from the sra toolkit.
 
 To install the srapy python package run the two following commands
@@ -108,7 +108,7 @@ Convert the sra file to a pair of fastq files
 sratoolkit.2.8.2-1-ubuntu64/bin/fastq-dump --split-files --origfmt --gzip SRR3382385.sra --maxSpotId 1000000
 ```
 Here I added the --maxSpotId 1000000 option to only use the first 1M reads for testing the analysis
-remove this option to run on the full dataset (this takes a litle while to complete).
+remove this option to run on the full dataset (this takes a little while to complete).
 
 ## 6. Fetch the id files
 ´´´
