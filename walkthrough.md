@@ -111,9 +111,9 @@ Here I added the --maxSpotId 1000000 option to only use the first 1M reads for t
 remove this option to run on the full dataset (this takes a little while to complete).
 
 ## 6. Fetch the id files
-´´´
+```
 git clone https://github.com/SpatialTranscriptomicsResearch/st_pipeline.git
-´´´
+```
 
 ## 7. Run the st pipeline
 ```
