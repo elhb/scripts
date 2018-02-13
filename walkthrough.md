@@ -79,7 +79,7 @@ and then convert them to fastq using fastq dump command from the sra toolkit.
 
 To install the srapy python package run the two following commands
 ```
-sudo apt-get install libxml2 libxml2-dev # note that this command uses apt which might not be the appropriate pkg manager for your system
+sudo apt-get install libxslt1-dev libxml2-dev # note that this command uses apt which might not be the appropriate pkg manager for your system
 pip install srapy
 ```
 
